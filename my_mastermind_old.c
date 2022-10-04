@@ -44,15 +44,29 @@ void current_progress(int correct, int wrong){
     printf("Well placed pieces: %d\nMisplaced pieces: %d\n", correct, wrong);
 }
 
+//  don't need? check_user_input already checks, duplicate function
+int read_user_input(void){
+
+
+    //read stdin
+        //if length != 4
+            //fail
+            //return -1
+        //if user input isn't all numbers (valid nums 0-9)
+            //fail
+            //return -2
+    return 0;
+}
+
 int str_length(char *s1){
     int i = 0;
     printf("length start\n");
     while (s1[i] != '\0')
         {
-            // printf("index[%i] [%i]\n", i, s1[i]);
+            printf("index[%i] [%i]\n", i, s1[i]);
         i += 1;
         }
-    // printf("length end [%i]\n", i);
+    printf("length end [%i]\n", i);
     return i;
 }
 
@@ -63,11 +77,8 @@ char* generate_4_random_numbers(){
     //  initialize random number generator?
     srand((unsigned) time(&t));
     for (int i = 0; i < 4; i += 1) {
-        //  create random number 0 - 8 and cast to char
+        //  create random number 0 - 9 and cast to char
         tmp[i] = (char)((rand() % 10) + 48);
-        //  lazy reset 9 to 8
-        if (tmp[i] == '9')
-            tmp[i] = '8';
     }
     return tmp;
 }
@@ -98,14 +109,18 @@ int check_attempt_value(char* num_str){
 
 //  checks for user input values 0 - 8
 int check_code_values(char* num_str){
-    // printf("starting check code val [%s]\n", num_str);
+    printf("starting check code val [%s]\n", num_str);
     int tmp_remove_after = str_length(num_str);
-    // printf("strlen pew pewpew[%i]\n", tmp_remove_after);
+    // if (str_length(num_str) != 5)
+    //     //  incorrect len
+    //     printf("incorrect len [%i]\n", str_length(num_str));
+    //     return -3;
+    printf("strlen pew pewpew[%i]\n", tmp_remove_after);
     if (tmp_remove_after != 4) {
-        // printf("incorrect len [%i]\n", str_length(num_str));
+        printf("incorrect len [%i]\n", str_length(num_str));
         return -3;
     }
-    // printf ("starting custom index val check\n");
+    printf ("starting custom index val check\n");
     int converted;
     for (int i = 0; num_str[i] != '\0'; i += 1){
         //  char val isn't 0 - 8 in ascii value via decimal
@@ -117,9 +132,34 @@ int check_code_values(char* num_str){
             return -1;
         }
     }
-    // printf("check_code_val fin\n");
+    // printf("starting atoi in chk code val\n");
+    // for(int i = 0; num_str[i] != '\0'; i += 1) {
+    //     int value = atoi(&num_str[i]);
+    //     //  checks value 1 - 8 (9 is not part of the program)
+    //     if (!(value > 0 && value <= 8))
+    //         printf("val fail [%i]0-8\n", value);
+    //         return -1;
+    //     //  checks value 0
+    //     if (num_str[i] != '0')
+    //         printf("val fail 0\n");
+    //         return -1;
+    // }
+
+    printf("check_code_val fin\n");
     return 0;
 }
+
+//  helper function not as useful as having 2 separate funcs
+// int check_user_input(char* code, char* attempt){
+    
+//     // if (check_code_values(code) == -1)
+//     //     //  code fails
+//     //     return -1;
+//     if (check_attempt_value(attempt) == -1)
+//         //  attempts fail
+//         return -2;
+//     return 0;    
+// }
 
 //  not sure if needed?
 //  checks arg 3 and 5 for flag string i.e. "-c" for 3, "-t" for 5
@@ -156,54 +196,63 @@ char* str_duplicate(char *s1){
     return tmp;
 }
 
+void trash_string(char* s1) {
+    s1[0] = 'a';
+    s1[1] = 'b';
+    s1[2] = 'c';
+    s1[3] = 'd';
+    s1[4] = '\0';
+}
+
 int main(int ac, char** av){
     printf("total args [%i]\n", ac);
     if (ac == 1) {
+        char test[5];
+        // char *tmp;
+        // int x = read(0, test, sizeof(test));
         int x;
+        // char pew[] = "abcd";
         char pew[] = "abcd";
-        // printf("pew is [%s]\nlast [%i]\n", pew, pew[4]);
+        printf("pew is [%s]\nlast [%i]\n", pew, pew[4]);
         printf("reading user input\n");
+        // trash_string(test);
         //  default attempts
         int attempts = 10;
-        char* code = generate_4_random_numbers();
-        printf("random4 [%s]\n", code);
+        char code[] = "0000";
+        // printf("sizeof test [%lu]\n", sizeof(test));
+        // printf("sizeof test [%lu]\n", sizeof(pew));
         while ((x = read(0, pew, sizeof(pew))) > 0){
+            // x = read(0, test, sizeof(test));
+            // x = read(0, pew, sizeof(pew));
             pew[x - 1] = '\0';
-            // printf("input [%s]\nx = [%i]", pew, x);
-            if (attempts < 1) {
-                printf("Game Over!\n");
-                return -1;
-            }
-            round_message(attempts);
+            // printf("pew end[%i][%i] x = [%i]\n", pew[x] - '0', pew[x], x);
+            // printf("x [%d]\n", x);
+            // printf("input [%s]", test);
+            printf("input [%s]\nx = [%i]", pew, x);
+            // write(1, test, x);
+            // tmp = str_duplicate(test);
+            // test[5] = '\0';
+            // printf("test [%s]", tmp);
+            // check_user_input(test, )
+            // if (check_code_values(test) == 0)
             if (x != 5){
-                // printf("[ %i / 5 ] read bytes\n", x);
-                invalid_input_message();
-                attempts -= 1;
+                printf("[ %i / 5 ] read bytes\n", x);
                 continue;
             }
             if (check_code_values(pew) == 0){
-                printf("check_code_val passes [%s]\n", pew);
-                //  check code match w/ user input
-                if (my_str_compare(code, pew) == 0)
-                {
-                    win_message();
-                    //  match!
-                    break;
-                }
-                attempts -= 1;
+                printf("check_code_val passes\n");
                 break;
             }
-            else {
-                invalid_input_message();
-                continue;
-            }
+            // printf("fail check code val\n");
             invalid_input_message();
         }
+        // printf("x (read bytes) [%i]", x);
         //  read error
-        if (x < 0){
+        if (x < 0)
             printf("read error\n");
             return -1;
-        }
+        
+        // printf("hmm input is\n[%s]\n", test);
         printf("hmm input is\n[%s]\n", pew);
     }
     // printf("test [%s]\n", av[0]);
