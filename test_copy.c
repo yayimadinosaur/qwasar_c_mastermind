@@ -8,6 +8,26 @@ typedef struct hey{
     int incorrect;
 } wtf;
 
+void initial_message(void){
+    printf("Will you find the secret code?\nPlease enter a valid guess\n");
+}
+
+void win_message(void){
+    printf("Congratz! You did it!\n");
+}
+
+void round_message(int round_number){
+    printf("---\nRound %d\n", round_number);
+}
+
+void invalid_input_message(void){
+    printf("Wrong input!\n");
+}
+
+void current_progress(int correct, int wrong){
+    printf("Well placed pieces: %d\nMisplaced pieces: %d\n", correct, wrong);
+}
+
 int str_length(char *s1){
     int i = 0;
     // printf("length start\n");
@@ -86,7 +106,7 @@ char* generate_4_random_numbers(){
 //  checks if char is between 0 - 8
 int check_code_value(char c){
     if (!(c - '0' >= 0 && c - '0' <= 8)){
-        printf("code val [%c] fails\n", c);
+        // printf("code val [%c] fails\n", c);
         return -1;
     }
     return 0;
@@ -194,8 +214,11 @@ int main(int ac, char** av){
         int round = 0;
 
         wtf pew;
+        initial_message();
         while (attempts > 0) {
-            printf("round %i\n", round);
+            round_message(round);
+            // printf("round %i\n", round);
+            write(1, ">", 1);
             while (read(0, &tmp, 1) > 0){
                 // printf("tmp [%s]\n", &tmp);
                 if (tmp == '\n'){
@@ -203,7 +226,9 @@ int main(int ac, char** av){
                     if (index != 4){
                         index = 0;
                         mem_set(guess, 0, 4);
-                        printf("wrong input! [len]\n");
+                        // printf("wrong input! [len]\n");
+                        invalid_input_message();
+                        write(1, ">", 1);
                         continue;
                     }
                     break;
@@ -211,8 +236,10 @@ int main(int ac, char** av){
                 //  not valid char
                 if (check_code_value(tmp) != 0){
                     //  manually fail user input
-                    printf("wrong input! [char]\n");
+                    // printf("wrong input! [char]\n");
+                    // invalid_input_message();
                     index = 5;
+                    // write(1, ">", 1);
                     continue;
                 }
                 //  valid char, add to guess
@@ -231,7 +258,8 @@ int main(int ac, char** av){
                 return 1;
             }
             else {
-                printf("perf match [%i]\nincorrect match[%i]\n", pew.perfect, pew.incorrect);
+                // printf("perf match [%i]\nincorrect match[%i]\n", pew.perfect, pew.incorrect);
+                current_progress(pew.perfect, pew.incorrect);
                 index = 0;
                 mem_set(guess, 0, 4);
             }
@@ -239,7 +267,8 @@ int main(int ac, char** av){
             attempts -= 1;
         }
         if (attempts == 0){
-            printf("ran out of attempts\nGAME OVER!");
+            // printf("ran out of attempts\nGAME OVER!");
+            win_message();
             return -1;
         }
     }
