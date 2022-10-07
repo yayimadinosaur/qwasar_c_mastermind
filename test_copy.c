@@ -212,14 +212,17 @@ int main(int ac, char** av){
         //  reset to 10 after testing
         int attempts = 3;
         int round = 0;
-
+        int read_bytes;
         wtf pew;
         initial_message();
         while (attempts > 0) {
             round_message(round);
             // printf("round %i\n", round);
             write(1, ">", 1);
-            while (read(0, &tmp, 1) > 0){
+            while ((read_bytes = read(0, &tmp, 1)) > 0){
+                // printf("tmp [%c]", tmp);
+                // if (tmp == 0)
+                //     return -2;
                 // printf("tmp [%s]\n", &tmp);
                 if (tmp == '\n'){
                     //  incorrect user input
@@ -247,6 +250,8 @@ int main(int ac, char** av){
                     guess[index] = tmp;
                 index += 1;
             }
+            if (read_bytes == 0)
+                return -2;
             printf("guess [%s]\n", guess);
             pew.incorrect = 0;
             pew.perfect = 0;
