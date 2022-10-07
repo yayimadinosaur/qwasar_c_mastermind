@@ -252,7 +252,8 @@ int main(int ac, char** av){
             pew.perfect = 0;
             //  check match
             if (match_codes(match, guess, &pew) == 4){
-                printf("winner winner chicken dinner! 4 matches!\n");
+                // printf("winner winner chicken dinner! 4 matches!\n");
+                win_message();
                 index = 0;
                 mem_set(guess, 0, 4);
                 return 1;
