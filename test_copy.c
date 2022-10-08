@@ -9,7 +9,7 @@ typedef struct hey{
 } wtf;
 
 typedef struct game_data{
-    int user_attempts;
+    int* user_attempts;
     char* user_code;
 } mastermind_data;
 
@@ -290,12 +290,14 @@ int parse_user_flags(char* flag1){
 //  checks flag param input for valid values for -c [ 0000 - 8888 ] or -t [ > 0 ]
 int parse_user_flag_params(char* user_code, char* user_attempts){
     //  user input code is not a number
-    if (user_code)
-        //length check
+    if (user_code){
+        //  length check
         if (str_length(user_code) != 4)
             return -1;
+        //  value check
         if (check_for_nums(user_code) != 0)
             return -2;
+    }
     if (user_attempts){
         //  user_attempts is not a number
         if (check_for_nums(user_attempts) != 0)
@@ -311,20 +313,20 @@ int parse_user_flag_params(char* user_code, char* user_attempts){
 //         return -1;
 // }
 
-int handle_flags(int user_flag, char* av, mastermind_data data){
+int handle_flags(int user_flag, char* av, char** code, mastermind_data data){
     printf("handling flags [%d]\n", user_flag);
     //  flag = -t
     if (user_flag == 1){
         printf("flag is 1\n");
         if (parse_user_flag_params(NULL, av) < 0) {
             printf("flag t chk fail\n");
-            // invalid_input_message();
             return -2;
         }
-        data.user_attempts = atoi(av);
-        if (data.user_attempts < 1)
+        data.user_attempts[0] = atoi(av);
+        //  check for non valid values [ < 0 ]
+        if (data.user_attempts[0] < 1)
             return -3;
-        printf("data user_attempt [%d]", data.user_attempts);
+        printf("data user_attempt [%d]\n", data.user_attempts[0]);
         return 1;
     }
     //  flag = -c
@@ -332,16 +334,14 @@ int handle_flags(int user_flag, char* av, mastermind_data data){
         printf("flag is 2\n");
         if (parse_user_flag_params(av, NULL) < 0) {
             printf("flag c chk fail\n");
-            // invalid_input_message();
             return -4;
         }
-        data.user_code = av;
-        printf("data usercode [%s]\n", data.user_code);
+        *code = av;
+        // data.user_code = av;
+        // printf("data usercode pew [%s]\n", data.user_code);
         return 2;
     }
     //  invalid flag or flag input param
-    // printf("invalid flag input user flag[%d]\n", user_flag);
-    // // invalid_input_message();
     return -1;
 }
 
@@ -358,15 +358,28 @@ char* set_match_value(char* user_code){
     return match;
 }
 
-int start_game(int user_attempts, char* user_code){
+int assign_attempts(int attempt_data){
+    if (attempt_data == 0)
+        return 10;
+    return attempt_data;
+}
+
+int start_game(int user_attempts, char* user_code, mastermind_data data){
+    // printf("start game data info atmp [%d] code [%s]\n", data.user_attempts, data.user_code);
     //  no user 4 digit code, generate random one
-    char* match = set_match_value(user_code);
-    //  set to random default value
+    printf("start game user code [%s]\n", user_code);
+    char* match;
+    if (user_code == NULL)
+        //  set to random default value
+        match = set_match_value(user_code);
+    else
+        match = user_code;
     char guess[] = "abcd";
     int read_index = 0;
     char tmp;
     //  reset to 10 after testing
-    int attempts = user_attempts == 0 ? attempts = 10 : user_attempts;
+    printf("user attempt from struct [%d]\n", user_attempts);
+    int attempts = assign_attempts(user_attempts);
     printf("attempts [%d]\n", attempts);
     int round = 0;
     int read_bytes;
@@ -446,8 +459,10 @@ int main(int ac, char** av){
     // char* user_code;
     //  default attempts
     mastermind_data data;
-    data.user_attempts = 10;
+    data.user_attempts = malloc(1 * sizeof(int));
+    data.user_attempts[0] = 10;
     int user_flag;
+    int flag_result;
     switch(ac){
         case 1:
             data.user_code = NULL;
@@ -462,17 +477,20 @@ int main(int ac, char** av){
             //  check for flag value
             user_flag = parse_user_flags(av[1]);
             printf("user flag = [%d]\n", user_flag);
-            if (handle_flags(user_flag, av[2], data) < 0){
+            flag_result = handle_flags(user_flag, av[2], &data.user_code, data);
+            if (flag_result < 0){
                 invalid_input_message();
                 return -2;
             }
+            if (flag_result == 1)
+                data.user_code = NULL;
             break;
         case 5:
             printf("5 params\n");
             break;
     }
-    printf("starting game?\n");
-    return start_game(data.user_attempts, data.user_code);
+    printf("main user atmpt val [%d][%s]\n", data.user_attempts[0], data.user_code);
+    return start_game(data.user_attempts[0], data.user_code, data);
 }
 
 
