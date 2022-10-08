@@ -8,6 +8,11 @@ typedef struct hey{
     int incorrect;
 } wtf;
 
+typedef struct game_data{
+    int user_attempts;
+    char* user_code;
+} mastermind_data;
+
 void initial_message(void){
     printf("Will you find the secret code?\nPlease enter a valid guess\n");
 }
@@ -52,21 +57,21 @@ char* generate_4_random_numbers(){
     return tmp;
 }
 
-// int my_str_compare(char* string1, char* string2){
-//     int i = 0;
-//     int j = 0;
-//     while (string1[i] != '\0' && string2[j] != '\0') {
-//         if (string1[i] != string2[j])
-//             //  characters don't match
-//             return -1;
-//         i += 1;
-//         j += 1;
-//     }
-//     if (i != j)
-//         //  string length doesn't match
-//         return -2;
-//     return 0;
-// }
+int my_str_compare(char* string1, char* string2){
+    int i = 0;
+    int j = 0;
+    while (string1[i] != '\0' && string2[j] != '\0') {
+        if (string1[i] != string2[j])
+            //  characters don't match
+            return -1;
+        i += 1;
+        j += 1;
+    }
+    if (i != j)
+        //  string length doesn't match
+        return -2;
+    return 0;
+}
 
 //  checks for user input values 0 - 8
     // int check_code_values(char* num_str){
@@ -115,26 +120,73 @@ int check_code_value(char c){
 int match_codes(char* code, char* guess, wtf* omg){
     int matches = 0;
     int seen[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-    for (int i = 0; i < 4; i += 1){
-        if (guess[i] == code[i]){
-            matches += 1;
-        }
-        //  add to seen array of ints
-        else {
-            int tmp = code[i] - '0';
-            seen[tmp] = seen[tmp] + 1;
-        }
+    for (int x = 0; x < 4; x += 1){
+        int converted = code[x] - '0';
+        seen[converted] += 1;
     }
-    // printf("total matches [%i]\n", matches);
-    omg->perfect = matches;
+    // write(1, "[", 1);
+    printf("just seen\n");
+    for (int y = 0; y < 9; y += 1){
+        printf(" %d, ", seen[y]);
+    }
+    printf("\n");
+    // write(1, "]", 1);
+    // for (int i = 0; i < 4; i += 1){
+    //     if (guess[i] == code[i]){
+    //         matches += 1;
+    //     }
+    //     //  add to seen array of ints
+    //     else {
+    //         int tmp = code[i] - '0';
+    //         seen[tmp] = seen[tmp] + 1;
+    //     }
+    // }
+    // // printf("total matches [%i]\n", matches);
+    // omg->perfect = matches;
+    // for (int j = 0; j < 4; j += 1){
+    //     //  already matched
+    //     int converted = guess[j] - '0';
+    //     if (seen[converted] > 0){
+    //         omg->incorrect += 1;
+    //         seen[converted] -= 1;
+    //     }   
+    // }
     for (int j = 0; j < 4; j += 1){
-        //  already matched
-        int converted = guess[j] - '0';
-        if (seen[converted] > 0){
-            omg->incorrect += 1;
-            seen[converted] -= 1;
-        }   
+        //  full match
+        int need = guess[j] - '0';
+        printf("need [%d]\n", need);
+        if (guess[j] == code[j]){
+            omg->perfect += 1;
+            matches += 1;
+            seen[need] -= 1;
+        // }
+        // //  doesn't match
+        // else if (guess[j] != code[j]) {
+        //     //  check guess if in seen
+        //     if (seen[need] > 0)
+        //         printf("check seen val [%d]", seen[need]);
+        //         omg->incorrect += 1;
+        //         seen[need] -= 1;
+        }
     }
+    //  look for mismatches
+    for (int i = 0; i < 4; i += 1){
+        int need = guess[i] - '0';
+        printf("need [%d]\n", need);
+        if (guess[i] == code[i])
+            continue;
+        else {
+            if (seen[need] > 0) {
+                omg->incorrect += 1;
+                seen[need] -= 1;
+            }
+        }
+    }
+    printf("seen end\n");
+    for (int y = 0; y < 9; y += 1){
+        printf(" %d, ", seen[y]);
+    }
+    printf("\n");
     return matches;   
 }
 
@@ -189,96 +241,240 @@ void* mem_set(void *s1, int c, int length){
     return s1;
 }
 
-// char* str_cpy(char* dst, const char* src)
-// {
-// 	int i = 0;
-// 	while (src[i] != '\0')
-// 	{
-// 		dst[i] = src[i];
-// 		i++;
-// 	}
-// 	if (src[i] == '\0')
-// 		dst[i] = '\0';
-// 	return dst;
+char* str_cpy(char* dst, const char* src)
+{
+	int i = 0;
+	while (src[i] != '\0')
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	if (src[i] == '\0')
+		dst[i] = '\0';
+	return dst;
+}
+
+//  checks for -c or -t
+int parse_user_flags(char* flag1){
+    // printf("flag [%s]", flag1);
+    // if (flag1)
+    //     return my_str_compare(flag1, "-t") == 0 ? 1 : -1;
+    //     // if (my_str_compare(flag1, "-t") != 0)
+    //     //     return -1;
+    //     // return 1;
+    // if (flag2)
+    //     return my_str_compare(flag2, "-c") == 0 ? 2 : -2;
+    //     // if (my_str_compare(flag2, "-c") != 0)
+    //     //     return -2;
+    //     // return 2;
+    if (my_str_compare(flag1, "-t") == 0)
+        return 1;
+    else if (my_str_compare(flag1, "-c") == 0)
+        return 2;
+    return 0;
+}
+
+//  checks flag param input values for -c or -t
+int parse_user_flag_params(char* user_code, char* user_attempts){
+    if (user_code)
+        if (atoi(user_code) == 0)
+            return -1;
+    if (user_attempts)
+        //  user_attempts is not a number
+        if (atoi(user_attempts) == 0)
+            return -2;
+    //  success
+    return 0;
+}
+
+// int parse_user_attempts(char* user_attempts){
+//     int num_check;
+//     if (atoi(user_attempts) == 0)
+//         return -1;
 // }
 
-int main(int ac, char** av){
-    if (ac == 1){
-        char* match = generate_4_random_numbers();
+int handle_flags(int user_flag, char* av, mastermind_data data){
+    printf("handling flags [%d]\n", user_flag);
+    //  flag = -t
+    if (user_flag == 1){
+        if (parse_user_flag_params(NULL, av) < 0) {
+            printf("flag t chk fail\n");
+            // invalid_input_message();
+            return -2;
+        }
+        data.user_attempts = atoi(av);
+        if (data.user_attempts < 1)
+            return -4;
+    }
+    //  flag = -c
+    else if (user_flag == 2){
+        if (parse_user_flag_params(av, NULL) < 0) {
+            printf("flag c chk fail\n");
+            // invalid_input_message();
+            return -3;
+        }
+        data.user_code = av;
+    }
+    //  invalid flag or flag input param
+    printf("invalid flag input user flag[%d]\n", user_flag);
+    // invalid_input_message();
+    return -4;
+}
+
+char* set_match_value(char* user_code){
+    char* match;
+    if (!user_code){
+        match = generate_4_random_numbers();
         printf("gen 4 ran [%s]\n", match);
-        char guess[] = "abcd";
-        int index = 0;
-        char tmp;
-        //  reset to 10 after testing
-        int attempts = 3;
-        int round = 0;
-        int read_bytes;
-        wtf pew;
-        initial_message();
-        while (attempts > 0) {
-            round_message(round);
-            // printf("round %i\n", round);
-            write(1, ">", 1);
-            while ((read_bytes = read(0, &tmp, 1)) > 0){
-                // printf("tmp [%c]", tmp);
-                // if (tmp == 0)
-                //     return -2;
-                // printf("tmp [%s]\n", &tmp);
-                if (tmp == '\n'){
-                    //  incorrect user input
-                    if (index != 4){
-                        index = 0;
-                        mem_set(guess, 0, 4);
-                        // printf("wrong input! [len]\n");
-                        invalid_input_message();
-                        write(1, ">", 1);
-                        continue;
-                    }
-                    break;
-                }
-                //  not valid char
-                if (check_code_value(tmp) != 0){
-                    //  manually fail user input
-                    // printf("wrong input! [char]\n");
-                    // invalid_input_message();
-                    index = 5;
-                    // write(1, ">", 1);
+    }
+    else {
+        match = user_code;
+        printf("user code = [%s]", match);
+    }
+    return match;
+}
+
+int start_game(int user_attempts, char* user_code){
+    //  no user 4 digit code, generate random one
+    char* match = set_match_value(user_code);
+    //  set to random default value
+    char guess[] = "abcd";
+    int read_index = 0;
+    char tmp;
+    //  reset to 10 after testing
+    int attempts = user_attempts == 0 ? attempts = 10 : user_attempts;
+    printf("attempts [%d]\n", attempts);
+    int round = 0;
+    int read_bytes;
+    wtf pew;
+    initial_message();
+    while (attempts > 0) {
+        round_message(round);
+        // printf("round %i\n", round);
+        write(1, ">", 1);
+        while ((read_bytes = read(0, &tmp, 1)) > 0){
+            // printf("tmp [%c]", tmp);
+            // if (tmp == 0)
+            //     return -2;
+            // printf("tmp [%s]\n", &tmp);
+            if (tmp == '\n'){
+                //  incorrect user input
+                if (read_index != 4){
+                    read_index = 0;
+                    mem_set(guess, 0, 4);
+                    // printf("wrong input! [len]\n");
+                    invalid_input_message();
+                    write(1, ">", 1);
                     continue;
                 }
-                //  valid char, add to guess
-                if (index < 4)
-                    guess[index] = tmp;
-                index += 1;
+                break;
             }
-            if (read_bytes == 0)
-                return -2;
-            printf("guess [%s]\n", guess);
-            pew.incorrect = 0;
-            pew.perfect = 0;
-            //  check match
-            if (match_codes(match, guess, &pew) == 4){
-                // printf("winner winner chicken dinner! 4 matches!\n");
-                win_message();
-                index = 0;
-                mem_set(guess, 0, 4);
-                return 1;
+            //  not valid char
+            if (check_code_value(tmp) != 0){
+                //  manually fail user input
+                // printf("wrong input! [char]\n");
+                // invalid_input_message();
+                read_index = 5;
+                // write(1, ">", 1);
+                continue;
             }
-            else {
-                // printf("perf match [%i]\nincorrect match[%i]\n", pew.perfect, pew.incorrect);
-                current_progress(pew.perfect, pew.incorrect);
-                index = 0;
-                mem_set(guess, 0, 4);
-            }
-            round += 1;
-            attempts -= 1;
+            //  valid char, add to guess
+            if (read_index < 4)
+                guess[read_index] = tmp;
+            read_index += 1;
         }
-        if (attempts == 0){
-            // printf("ran out of attempts\nGAME OVER!");
+        if (read_bytes == 0)
+            return -2;
+        printf("guess [%s]\n", guess);
+        pew.incorrect = 0;
+        pew.perfect = 0;
+        //  check match
+        if (match_codes(match, guess, &pew) == 4){
+            // printf("winner winner chicken dinner! 4 matches!\n");
             win_message();
-            return -1;
+            read_index = 0;
+            mem_set(guess, 0, 4);
+            return 0;
         }
+        else {
+            // printf("perf match [%i]\nincorrect match[%i]\n", pew.perfect, pew.incorrect);
+            current_progress(pew.perfect, pew.incorrect);
+            read_index = 0;
+            mem_set(guess, 0, 4);
+        }
+        round += 1;
+        attempts -= 1;
     }
-    return 0;
+    // if (attempts == 0){
+        printf("ran out of attempts\nGAME OVER!");
+        // win_message();
+        return -1;
+    // }
+}
+
+int main(int ac, char** av){
+    //  test printing
+    printf("ac == [%d]\n", ac);
+    for (int i = 0; i < ac; i += 1){
+        printf("[%d] [%s]\n", i, av[i]);
+    }
+    //  end of test printing
+    // char* user_code;
+    //  default attempts
+    mastermind_data data;
+    data.user_attempts = 10;
+    int user_flag;
+    switch(ac){
+        case 1:
+            data.user_code = NULL;
+            break;
+        //  all invalid # of args
+        case 2:
+        case 4:
+        default:
+            printf("incorrect params [%d]\n", ac);
+            return -1;
+        case 3:
+            //  check for flag value
+            user_flag = parse_user_flags(av[1]);
+            printf("user flag = [%d]\n", user_flag);
+            if (handle_flags(user_flag, av[2], data) < 0){
+                invalid_input_message();
+                return -2;
+            }
+            break;
+            //  flag = -t
+            // if (user_flag == 1){
+            //     if (parse_user_flag_params(NULL, av[2]) < 0) {
+            //         printf("flag t chk fail\n");
+            //         invalid_input_message();
+            //         return -2;
+            //     }
+            //     data.user_attempts = atoi(av[2]);
+            //     if (data.user_attempts < 1)
+            //         return -4;
+            // }
+            // //  flag = -c
+            // else if (user_flag == 2){
+            //     if (parse_user_flag_params(av[2], NULL) < 0) {
+            //         printf("flag c chk fail\n");
+            //         invalid_input_message();
+            //         return -3;
+            //     }
+            //     data.user_code = av[2];
+            // }
+            // else {
+            //     //  invalid flag or flag input param
+            //     printf("invalid flag input user flag[%d]\n", user_flag);
+            //     invalid_input_message();
+            //     return -4;
+            // }
+        case 5:
+            printf("5 params\n");
+            break;
+    }
+    printf("starting game?\n");
+    return start_game(data.user_attempts, data.user_code);
 }
 
 
