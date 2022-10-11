@@ -287,6 +287,7 @@ int parse_user_flags(char* flag1){
     return -1;
 }
 
+
 //  checks flag param input for valid values for -c [ 0000 - 8888 ] or -t [ > 0 ]
 int parse_user_flag_params(char* user_code, char* user_attempts){
     //  user input code is not a number
@@ -316,9 +317,10 @@ int parse_user_flag_params(char* user_code, char* user_attempts){
 int handle_flags(int user_flag, char* av, char** code, mastermind_data data){
     printf("handling flags [%d]\n", user_flag);
     //  flag = -t
+    printf("av is [%s]\n", av);
     if (user_flag == 1){
         printf("flag is 1\n");
-        if (parse_user_flag_params(NULL, av) < 0) {
+        if (parse_user_flag_params()) {
             printf("flag t chk fail\n");
             return -2;
         }
@@ -332,7 +334,7 @@ int handle_flags(int user_flag, char* av, char** code, mastermind_data data){
     //  flag = -c
     else if (user_flag == 2){
         printf("flag is 2\n");
-        if (parse_user_flag_params(av, NULL) < 0) {
+        if (parse_user_flag_params(char *user_code, char *user_attempts) > -1) {
             printf("flag c chk fail\n");
             return -4;
         }
@@ -476,8 +478,10 @@ int main(int ac, char** av){
         case 3:
             //  check for flag value
             user_flag = parse_user_flags(av[1]);
+            if (user_flag < 0)
+                return -5;   //fix after
             printf("user flag = [%d]\n", user_flag);
-            flag_result = handle_flags(user_flag, av[2], &data.user_code, data);
+            flag_result = handle_flags(user_flag, av[1], &data.user_code, data);
             if (flag_result < 0){
                 invalid_input_message();
                 return -2;
