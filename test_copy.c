@@ -94,7 +94,7 @@ int check_code_value(char c){
     return 0;
 }
 
-int match_codes(char* code, char* guess, match_data* omg){
+int match_codes(char* code, char* guess, match_data* data){
     int matches = 0;
     int seen[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     for (int x = 0; x < 4; x += 1){
@@ -105,7 +105,7 @@ int match_codes(char* code, char* guess, match_data* omg){
         //  full match
         int need = guess[j] - '0';
         if (guess[j] == code[j]){
-            omg->perfect += 1;
+            data->perfect += 1;
             matches += 1;
             seen[need] -= 1;
         }
@@ -117,7 +117,7 @@ int match_codes(char* code, char* guess, match_data* omg){
             continue;
         else {
             if (seen[need] > 0) {
-                omg->incorrect += 1;
+                data->incorrect += 1;
                 seen[need] -= 1;
             }
         }
@@ -239,8 +239,10 @@ int start_game(int user_attempts, char* user_code, mastermind_data data){
                 guess[read_count] = tmp;
             read_count += 1;
         }
-        if (read_bytes == 0)
+        if (read_bytes == 0){
+            printf("exit\n");
             return -2;
+        }
         match_data.incorrect = 0;
         match_data.perfect = 0;
         if (match_codes(match, guess, &match_data) == 4){
