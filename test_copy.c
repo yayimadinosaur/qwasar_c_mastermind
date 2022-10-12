@@ -157,28 +157,20 @@ int parse_flag_c(char* user_code){
 }
 
 int handle_flags(int user_flag, char* av, char** code, mastermind_data data){
-    // printf("handling flags [%d]\n", user_flag);
-    //  flag = -t
-    // printf("av is [%s]\n", av);
     if (user_flag == 1){
-        // printf("flag is 1\n");
         if (parse_flag_t(av) < 0){
-            // printf("flag t chk fail\n");
             return -2;
         }
         data.user_attempts[0] = atoi(av);
         //  check for non valid values [ < 1 ]
         if (data.user_attempts[0] < 1) {
-            // printf("t flag val negative or 0\n");
             return -3;
         }
-        // printf("data user_attempt [%d]\n", data.user_attempts[0]);
         return 1;
     }
     //  flag = -c
     else if (user_flag == 2){
         if (parse_flag_c(av) < 0) {
-            // printf("flag c chk fail\n");
             return -4;
         }
         *code = av;
@@ -192,11 +184,9 @@ char* set_match_value(char* user_code){
     char* match;
     if (!user_code){
         match = generate_4_random_numbers();
-        // printf("gen 4 ran [%s]\n", match);
     }
     else {
         match = user_code;
-        // printf("user code = [%s]", match);
     }
     return match;
 }
@@ -260,7 +250,6 @@ int start_game(int user_attempts, char* user_code, mastermind_data data){
         else {
             current_progress(match_data.perfect, match_data.incorrect);
             read_count = 0;
-            // mem_set(guess, 0, 4);
         }
         round += 1;
         attempts -= 1;
