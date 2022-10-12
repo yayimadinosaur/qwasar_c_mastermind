@@ -207,7 +207,7 @@ int start_game(int user_attempts, char* user_code, mastermind_data data){
     initial_message();
     while (attempts > 0) {
         round_message(round);
-        write(1, ">", 1);
+        // write(1, ">", 1);
         while ((read_bytes = read(0, &tmp, 1)) > 0){
             if (tmp == '\n'){
                 if (read_count != 4){
