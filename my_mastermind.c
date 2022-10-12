@@ -1,17 +1,4 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h> //for atoi rand() srand()
-#include <time.h>   //time()
-
-typedef struct match_info{
-    int perfect;
-    int incorrect;
-} match_data;
-
-typedef struct game_data{
-    int* user_attempts;
-    char* user_code;
-} mastermind_data;
+#include "my_mastermind.h"
 
 void initial_message(void){
     printf("Will you find the secret code?\nPlease enter a valid guess\n");
