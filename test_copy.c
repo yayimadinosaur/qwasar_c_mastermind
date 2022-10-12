@@ -35,7 +35,6 @@ void current_progress(int correct, int wrong){
 
 int str_length(char *s1){
     int i = 0;
-    // printf("length start\n");
     while (s1[i] != '\0')
         i += 1; 
     return i;
@@ -90,7 +89,6 @@ int my_str_compare(char* string1, char* string2){
 //  checks if char is between 0 - 8
 int check_code_value(char c){
     if (!(c - '0' >= 0 && c - '0' <= 8)){
-        // printf("code val [%c] fails\n", c);
         return -1;
     }
     return 0;
@@ -103,15 +101,9 @@ int match_codes(char* code, char* guess, match_data* omg){
         int converted = code[x] - '0';
         seen[converted] += 1;
     }
-    // printf("just seen\n");
-    // for (int y = 0; y < 9; y += 1){
-    //     printf(" %d, ", seen[y]);
-    // }
-    // printf("\n");
     for (int j = 0; j < 4; j += 1){
         //  full match
         int need = guess[j] - '0';
-        // printf("need [%d]\n", need);
         if (guess[j] == code[j]){
             omg->perfect += 1;
             matches += 1;
@@ -121,7 +113,6 @@ int match_codes(char* code, char* guess, match_data* omg){
     //  look for mismatches
     for (int i = 0; i < 4; i += 1){
         int need = guess[i] - '0';
-        // printf("need [%d]\n", need);
         if (guess[i] == code[i])
             continue;
         else {
@@ -131,37 +122,8 @@ int match_codes(char* code, char* guess, match_data* omg){
             }
         }
     }
-    // printf("seen end\n");
-    // for (int y = 0; y < 9; y += 1){
-    //     printf(" %d, ", seen[y]);
-    // }
-    // printf("\n");
     return matches;   
 }
-
-//  FUNCTION NOT REALLY NEEDED DELETE
-// void* mem_set(void *s1, int c, int length){
-//     unsigned char *dst = s1;
-//     while (length > 0){
-//         *dst = (unsigned char)c;
-//         length -= 1;
-//     }
-//     return s1;
-// }
-
-//  FUNCTION UNUSED DELETE
-// char* str_cpy(char* dst, const char* src)
-// {
-// 	int i = 0;
-// 	while (src[i] != '\0')
-// 	{
-// 		dst[i] = src[i];
-// 		i++;
-// 	}
-// 	if (src[i] == '\0')
-// 		dst[i] = '\0';
-// 	return dst;
-// }
 
 //  checks for -c or -t
 int parse_user_flags(char* flag1){
@@ -195,28 +157,28 @@ int parse_flag_c(char* user_code){
 }
 
 int handle_flags(int user_flag, char* av, char** code, mastermind_data data){
-    printf("handling flags [%d]\n", user_flag);
+    // printf("handling flags [%d]\n", user_flag);
     //  flag = -t
-    printf("av is [%s]\n", av);
+    // printf("av is [%s]\n", av);
     if (user_flag == 1){
-        printf("flag is 1\n");
+        // printf("flag is 1\n");
         if (parse_flag_t(av) < 0){
-            printf("flag t chk fail\n");
+            // printf("flag t chk fail\n");
             return -2;
         }
         data.user_attempts[0] = atoi(av);
         //  check for non valid values [ < 1 ]
         if (data.user_attempts[0] < 1) {
-            printf("t flag val negative or 0\n");
+            // printf("t flag val negative or 0\n");
             return -3;
         }
-        printf("data user_attempt [%d]\n", data.user_attempts[0]);
+        // printf("data user_attempt [%d]\n", data.user_attempts[0]);
         return 1;
     }
     //  flag = -c
     else if (user_flag == 2){
         if (parse_flag_c(av) < 0) {
-            printf("flag c chk fail\n");
+            // printf("flag c chk fail\n");
             return -4;
         }
         *code = av;
