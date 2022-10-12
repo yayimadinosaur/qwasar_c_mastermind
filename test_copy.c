@@ -57,13 +57,14 @@ char* generate_4_random_numbers(){
     return tmp;
 }
 
-//  checks chars in string if it's a valid num in range (0-8)
-int check_for_nums(char* some_string){
+//  checks chars in string if it's a valid num in range (0 - n)
+//      n can be 1 - 9 (inclusive)
+int check_for_nums_n(char* some_string, int n){
     for (int i = 0; i < str_length(some_string); i += 1){
         //  change char to ascii decimal value
         int val = some_string[i] - 0;
         //  compare to valid decimal values
-        if (!(val >= 48 && val <= 56)){
+        if (!(val >= 48 && val <= 48 + n)){
             return -1;
         }
     }
@@ -287,24 +288,53 @@ int parse_user_flags(char* flag1){
     return -1;
 }
 
-
+//      OLD / UNUSED, separated into parse_flag_t and parse_flag_c
+//
 //  checks flag param input for valid values for -c [ 0000 - 8888 ] or -t [ > 0 ]
-int parse_user_flag_params(char* user_code, char* user_attempts){
-    //  user input code is not a number
+// int parse_user_flag_params(char* user_code, char* user_attempts){
+//     //  user input code is not a number
+//     if (user_code){
+//         //  length check
+//         if (str_length(user_code) != 4)
+//             return -1;
+//         //  value check
+//         if (check_for_nums(user_code) != 0)
+//             return -2;
+//     }
+//     if (user_attempts){
+//         //  user_attempts is not a number
+//         if (check_for_nums(user_attempts) != 0)
+//             return -3;
+//     }
+//     //  success
+//     return 0;
+// }
+
+//  checks user attempt param value
+int parse_flag_t(char* user_attempts){
+    // int tmp;
+    //  number string - character check
+    if (check_for_nums_n(user_attempts, 9) < 0)
+        return -1;
+    // tmp = atoi(user_attempts);
+    // //  check values
+    // if (tmp == 0)
+    //     return -2;
+    // return tmp;
+    return atoi(user_attempts);
+}
+
+//  checks user code param value
+int parse_flag_c(char* user_code){
+//  user input code is not a number
     if (user_code){
         //  length check
         if (str_length(user_code) != 4)
             return -1;
         //  value check
-        if (check_for_nums(user_code) != 0)
+        if (check_for_nums_n(user_code, 8) != 0)
             return -2;
     }
-    if (user_attempts){
-        //  user_attempts is not a number
-        if (check_for_nums(user_attempts) != 0)
-            return -3;
-    }
-    //  success
     return 0;
 }
 
@@ -320,21 +350,31 @@ int handle_flags(int user_flag, char* av, char** code, mastermind_data data){
     printf("av is [%s]\n", av);
     if (user_flag == 1){
         printf("flag is 1\n");
-        if (parse_user_flag_params()) {
+        // if (parse_user_flag_params(NULL, av) < 0) {
+        //     printf("flag t chk fail\n");
+        //     return -2;
+        // }
+        if (parse_flag_t(av) < 0){
             printf("flag t chk fail\n");
             return -2;
         }
         data.user_attempts[0] = atoi(av);
-        //  check for non valid values [ < 0 ]
-        if (data.user_attempts[0] < 1)
+        //  check for non valid values [ < 1 ]
+        if (data.user_attempts[0] < 1) {
+            printf("t flag val negative or 0\n");
             return -3;
+        }
         printf("data user_attempt [%d]\n", data.user_attempts[0]);
         return 1;
     }
     //  flag = -c
     else if (user_flag == 2){
-        printf("flag is 2\n");
-        if (parse_user_flag_params(char *user_code, char *user_attempts) > -1) {
+        // printf("flag is 2\n");
+        // if (parse_user_flag_params(av, NULL) < 0) {
+        //     printf("flag c chk fail\n");
+        //     return -4;
+        // }
+        if (parse_flag_c(av) < 0) {
             printf("flag c chk fail\n");
             return -4;
         }
@@ -463,11 +503,12 @@ int main(int ac, char** av){
     mastermind_data data;
     data.user_attempts = malloc(1 * sizeof(int));
     data.user_attempts[0] = 10;
+    data.user_code = NULL;
     int user_flag;
     int flag_result;
     switch(ac){
         case 1:
-            data.user_code = NULL;
+            // data.user_code = NULL;
             break;
         //  all invalid # of args
         case 2:
@@ -478,19 +519,46 @@ int main(int ac, char** av){
         case 3:
             //  check for flag value
             user_flag = parse_user_flags(av[1]);
-            if (user_flag < 0)
+            if (user_flag < 0) {
+                free(data.user_attempts);
                 return -5;   //fix after
+            }
             printf("user flag = [%d]\n", user_flag);
-            flag_result = handle_flags(user_flag, av[1], &data.user_code, data);
+            flag_result = handle_flags(user_flag, av[2], &data.user_code, data);
             if (flag_result < 0){
                 invalid_input_message();
+                free(data.user_attempts);
                 return -2;
             }
-            if (flag_result == 1)
-                data.user_code = NULL;
+            // if (flag_result == 1)
+            //     data.user_code = NULL;
             break;
         case 5:
-            printf("5 params\n");
+            //  check first flag param
+            user_flag = parse_user_flags(av[1]);
+            if (user_flag < 0) {
+                free(data.user_attempts);
+                return -5;   //fix after
+            }
+            printf("user flag = [%d]\n", user_flag);
+            flag_result = handle_flags(user_flag, av[2], &data.user_code, data);
+            if (flag_result < 0){
+                invalid_input_message();
+                free(data.user_attempts);
+                return -2;
+            }
+            user_flag = parse_user_flags(av[3]);
+            if (user_flag < 0) {
+                free(data.user_attempts);
+                return -5;   //fix after
+            }
+            printf("user flag = [%d]\n", user_flag);
+            flag_result = handle_flags(user_flag, av[4], &data.user_code, data);
+            if (flag_result < 0){
+                invalid_input_message();
+                free(data.user_attempts);
+                return -2;
+            }
             break;
     }
     printf("main user atmpt val [%d][%s]\n", data.user_attempts[0], data.user_code);
