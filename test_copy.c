@@ -422,6 +422,7 @@ int start_game(int user_attempts, char* user_code, mastermind_data data){
     //  reset to 10 after testing
     printf("user attempt from struct [%d]\n", user_attempts);
     int attempts = assign_attempts(user_attempts);
+    free(data.user_attempts);
     printf("attempts [%d]\n", attempts);
     int round = 0;
     int read_bytes;
@@ -535,29 +536,44 @@ int main(int ac, char** av){
             break;
         case 5:
             //  check first flag param
-            user_flag = parse_user_flags(av[1]);
-            if (user_flag < 0) {
-                free(data.user_attempts);
-                return -5;   //fix after
-            }
-            printf("user flag = [%d]\n", user_flag);
-            flag_result = handle_flags(user_flag, av[2], &data.user_code, data);
-            if (flag_result < 0){
-                invalid_input_message();
-                free(data.user_attempts);
-                return -2;
-            }
-            user_flag = parse_user_flags(av[3]);
-            if (user_flag < 0) {
-                free(data.user_attempts);
-                return -5;   //fix after
-            }
-            printf("user flag = [%d]\n", user_flag);
-            flag_result = handle_flags(user_flag, av[4], &data.user_code, data);
-            if (flag_result < 0){
-                invalid_input_message();
-                free(data.user_attempts);
-                return -2;
+            // user_flag = parse_user_flags(av[1]);
+            // if (user_flag < 0) {
+            //     free(data.user_attempts);
+            //     return -5;   //fix after
+            // }
+            // printf("user flag = [%d]\n", user_flag);
+            // flag_result = handle_flags(user_flag, av[2], &data.user_code, data);
+            // if (flag_result < 0){
+            //     invalid_input_message();
+            //     free(data.user_attempts);
+            //     return -2;
+            // }
+            // user_flag = parse_user_flags(av[3]);
+            // if (user_flag < 0) {
+            //     free(data.user_attempts);
+            //     return -5;   //fix after
+            // }
+            // printf("user flag = [%d]\n", user_flag);
+            // flag_result = handle_flags(user_flag, av[4], &data.user_code, data);
+            // if (flag_result < 0){
+            //     invalid_input_message();
+            //     free(data.user_attempts);
+            //     return -2;
+            // }
+
+            for (int i = 0; i < 3; i += 2){
+                user_flag = parse_user_flags(av[i + 1]);
+                if (user_flag < 0) {
+                    free(data.user_attempts);
+                    return -5;   //fix after
+                }
+                printf("user flag = [%d]\n", user_flag);
+                flag_result = handle_flags(user_flag, av[i + 2], &data.user_code, data);
+                if (flag_result < 0){
+                    invalid_input_message();
+                    free(data.user_attempts);
+                    return -2;
+                }
             }
             break;
     }
