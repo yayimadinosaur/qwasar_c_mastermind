@@ -243,8 +243,7 @@ int start_game(int user_attempts, char* user_code, mastermind_data data){
         round += 1;
         attempts -= 1;
     }
-    //  lose
-    printf("ran out of attempts\nGAME OVER!");
+    printf("GAME OVER!\n");
     return -1;
 }
 
