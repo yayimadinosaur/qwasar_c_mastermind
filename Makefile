@@ -4,7 +4,7 @@ NAME = my_mastermind
 
 SRC = ./my_mastermind.c
 
-OBS = ./my_mastermind.o
+OBS = ${SRCS:.c=.o}
 
 INCL = ./my_mastermind.h
 
